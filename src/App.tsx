@@ -23,10 +23,11 @@ import { NewQuestionModal } from "./components/NewQuestionModal";
 import { LoadingOverlay, STAGES, Toast } from "./components/Overlays";
 import { TopicIcon, TOPIC_NAMES } from "./components/TopicIcon";
 
-// Demo mode for the live presentation: an uploaded/pasted/dropped screenshot is discarded, the Gemma
-// analysis is replayed (~10 s), and the hand-checked projectile question is loaded. Typed questions still
-// go to Gemma live. Add ?live=1 to the URL to send images to Gemma for real.
-const DEMO_UPLOAD = !new URLSearchParams(location.search).has("live");
+// Presentation mode (opt-in with ?demo=1): an uploaded/pasted/dropped screenshot is discarded, the Gemma
+// analysis is replayed (~10 s), and the hand-checked projectile question is loaded - so the live demo
+// doesn't depend on venue Wi-Fi or a 30-60 s solve. Typed questions still go to Gemma live.
+// Without ?demo=1, images are sent to Gemma for real.
+const DEMO_UPLOAD = new URLSearchParams(location.search).has("demo");
 const DEMO_STAGE_SECONDS = 1.6;
 
 const FIXTURE_META: SolveMeta = { model: "fixture", ms: 0, attempts: 0, repaired: false, source: "fixture" };

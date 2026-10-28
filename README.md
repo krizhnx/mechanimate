@@ -70,6 +70,8 @@ npm run typecheck
 npm run build && npm start   # production: one server on :8787 serving the built app
 ```
 
+Presentation mode: `/?demo=1` replays a recorded Gemma analysis for any uploaded image (always the projectile example) so a live demo doesn't depend on Wi-Fi or a 30–60 s solve. Without it, images go to Gemma for real.
+
 Deep links for demos: `/?ex=pulley-table&t=1.2&step=3` (example id, time in s, step index), `/?ex=q5-projectile&exam=1` (exam mode).
 
 ## Model
