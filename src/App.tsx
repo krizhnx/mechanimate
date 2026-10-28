@@ -27,7 +27,13 @@ import { TopicIcon, TOPIC_NAMES } from "./components/TopicIcon";
 // analysis is replayed (~10 s), and the hand-checked projectile question is loaded - so the live demo
 // doesn't depend on venue Wi-Fi or a 30-60 s solve. Typed questions still go to Gemma live.
 // Without ?demo=1, images are sent to Gemma for real.
-const DEMO_UPLOAD = new URLSearchParams(location.search).has("demo");
+// Sticky: ?demo=1 turns it on for this browser (survives reloads), ?demo=0 turns it off.
+const DEMO_UPLOAD = (() => {
+  const q = new URLSearchParams(location.search).get("demo");
+  if (q === "0") localStorage.removeItem("mech-demo");
+  else if (q !== null) localStorage.setItem("mech-demo", "1");
+  return localStorage.getItem("mech-demo") === "1";
+})();
 const DEMO_STAGE_SECONDS = 1.6;
 
 const FIXTURE_META: SolveMeta = { model: "fixture", ms: 0, attempts: 0, repaired: false, source: "fixture" };
