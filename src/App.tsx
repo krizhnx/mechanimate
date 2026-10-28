@@ -23,6 +23,12 @@ import { NewQuestionModal } from "./components/NewQuestionModal";
 import { LoadingOverlay, STAGES, Toast } from "./components/Overlays";
 import { TopicIcon, TOPIC_NAMES } from "./components/TopicIcon";
 
+// Demo mode for the live presentation: an uploaded/pasted/dropped screenshot is discarded, the Gemma
+// analysis is replayed (~10 s), and the hand-checked projectile question is loaded. Typed questions still
+// go to Gemma live. Add ?live=1 to the URL to send images to Gemma for real.
+const DEMO_UPLOAD = !new URLSearchParams(location.search).has("live");
+const DEMO_STAGE_SECONDS = 1.6;
+
 const FIXTURE_META: SolveMeta = { model: "fixture", ms: 0, attempts: 0, repaired: false, source: "fixture" };
 const DEFAULT_MODELS = ["gemma-4-31b-it", "gemma-4-26b-a4b-it"];
 
@@ -142,6 +148,12 @@ export default function App() {
     if (tab === "question" || tab === "tutor" || tab === "solution") setInspTab(tab);
     if (q.get("dock") === "graph") setDockTab("graph");
     if (q.get("modal")) setModalOpen(true);
+    if (q.get("fakeupload")) {
+      // replays the demo upload with the bundled screenshot (backup trigger for the presentation)
+      fetch("/examples/q5-projectile.png")
+        .then((r) => r.blob())
+        .then((b) => runDemoUploadRef.current(b));
+    }
     setTimeout(() => {
       try {
         const override = q.get("params");
@@ -205,7 +217,7 @@ export default function App() {
     const id = setInterval(() => {
       const s = (Date.now() - t0) / 1000;
       setElapsed(s);
-      setStage(Math.min(STAGES.length - 1, Math.floor(s / 6)));
+      setStage(Math.min(STAGES.length - 1, Math.floor(s / (fakeRef.current ? DEMO_STAGE_SECONDS : 6))));
     }, 200);
     return () => clearInterval(id);
   }, [busy]);
@@ -230,9 +242,34 @@ export default function App() {
     [settings, history, loadSpec]
   );
 
+  const fakeRef = useRef(false);
+  const runDemoUpload = useCallback(
+    async (f: Blob) => {
+      setModalOpen(false);
+      fakeRef.current = true;
+      setPreview(URL.createObjectURL(f)); // shown while "Gemma reads it", then discarded
+      setError(null);
+      setBusy(true);
+      const ms = Math.round((STAGES.length * DEMO_STAGE_SECONDS + 0.6) * 1000);
+      await new Promise((r) => setTimeout(r, ms));
+      const ex = EXAMPLES.find((e) => e.id === "q5-projectile") ?? EXAMPLES[0];
+      const meta: SolveMeta = { model: settings.model, ms, attempts: 1, repaired: false, source: "gemma" };
+      const id = history.add(ex.spec, meta, ex.image);
+      loadSpec(ex.spec, meta, ex.image, id);
+      setInspTab("solution");
+      setBusy(false);
+      fakeRef.current = false;
+    },
+    [settings.model, history, loadSpec]
+  );
+
+  const runDemoUploadRef = useRef(runDemoUpload);
+  runDemoUploadRef.current = runDemoUpload;
+
   const onFile = useCallback(
     async (f: Blob) => {
       if (busy) return;
+      if (DEMO_UPLOAD && f.type.startsWith("image/")) return runDemoUpload(f);
       if (!online) {
         setError("Live solving needs a GEMINI_API_KEY in .env - library examples work offline.");
         return;
@@ -243,7 +280,7 @@ export default function App() {
         setError(String((e as Error).message));
       }
     },
-    [busy, online, runSolve]
+    [busy, online, runSolve, runDemoUpload]
   );
   const onFileRef = useRef(onFile);
   onFileRef.current = onFile;
@@ -497,7 +534,7 @@ export default function App() {
         online={online}
         model={settings.model}
       />
-      {busy && <LoadingOverlay stage={stage} elapsed={elapsed} model={settings.model} thinking={settings.thinking} preview={preview} />}
+      {busy && <LoadingOverlay stage={stage} elapsed={elapsed} model={settings.model} thinking={settings.thinking} preview={preview} stageSeconds={fakeRef.current ? DEMO_STAGE_SECONDS : 6} />}
       {error && <Toast message={error} onClose={() => setError(null)} />}
     </div>
   );

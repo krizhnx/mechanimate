@@ -1691,7 +1691,7 @@ button.chip:disabled {
 .progress {
   height: 3px;
   border-radius: 3px;
-  background: #22222a;
+  background: var(--track);
   overflow: hidden;
   margin-top: 16px;
 }
@@ -1957,4 +1957,78 @@ button.chip:disabled {
 .demo-btn:hover {
   background: var(--accent-soft);
   border-color: var(--accent);
+}
+
+/* ============ Gemma analysis overlay ============ */
+.loading-orb.gemma {
+  background: linear-gradient(135deg, rgba(66, 133, 244, 0.16), rgba(138, 180, 248, 0.08));
+  border-color: rgba(66, 133, 244, 0.35);
+  animation: gemma-pulse 1.6s ease-in-out infinite;
+}
+@keyframes gemma-pulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(66, 133, 244, 0.35); }
+  50% { box-shadow: 0 0 0 8px rgba(66, 133, 244, 0); }
+}
+.scan-preview {
+  position: relative;
+  margin: 2px 0 14px;
+  height: 150px;
+  border-radius: var(--r);
+  overflow: hidden;
+  border: 1px solid var(--border-2);
+  background: #fff;
+}
+.scan-preview img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
+  transition: filter 0.4s ease;
+}
+.scan-preview:not(.read) img {
+  filter: saturate(0.6);
+}
+.scan-line {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 38px;
+  background: linear-gradient(180deg, rgba(66, 133, 244, 0), rgba(66, 133, 244, 0.28) 80%, rgba(66, 133, 244, 0.9));
+  border-bottom: 2px solid #4285f4;
+  animation: scan 1.5s ease-in-out infinite alternate;
+}
+@keyframes scan {
+  from { top: -38px; }
+  to { top: calc(100% - 36px); }
+}
+.scan-tag {
+  position: absolute;
+  left: 8px;
+  bottom: 8px;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 8px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 600;
+  color: #fff;
+  background: rgba(15, 23, 42, 0.78);
+  backdrop-filter: blur(6px);
+}
+.scan-preview.read .scan-tag {
+  background: rgba(5, 150, 105, 0.9);
+}
+.powered {
+  margin-top: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  font-size: 11.5px;
+  color: var(--text-3);
+}
+.powered b {
+  color: var(--text-2);
+  font-weight: 600;
 }
