@@ -1,8 +1,8 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { BookOpen, FileText, LineChart, Lock, MessageSquare, Play, ShieldCheck, SlidersHorizontal, Square, AlertTriangle } from "lucide-react";
+import { BookOpen, FileText, LineChart, Lock, MessageSquare, Moon, Play, ShieldCheck, SlidersHorizontal, Square, Sun, AlertTriangle } from "lucide-react";
 import { health, imageToPayload, solve, urlToPayload } from "./api";
 import type { ImagePayload, Settings } from "./api";
-import { EXAMPLES } from "./fixtures";
+import { EXAMPLES, practiceProjectile } from "./fixtures";
 import type { Example } from "./fixtures";
 import { useHistory } from "./history";
 import type { HistoryItem } from "./history";
@@ -37,6 +37,15 @@ export default function App() {
   const [params, setParams] = useState<Params>(EXAMPLES[0].spec.params);
   const [activeIdx, setActiveIdx] = useState<number | null>(null);
   const [examMode, setExamMode] = useState(false);
+  const [theme, setTheme] = useState<"dark" | "light">(() => {
+    const q = new URLSearchParams(location.search).get("theme");
+    if (q === "light" || q === "dark") return q;
+    return localStorage.getItem("mech-theme") === "light" ? "light" : "dark";
+  });
+  useEffect(() => {
+    document.documentElement.dataset.theme = theme;
+    localStorage.setItem("mech-theme", theme);
+  }, [theme]);
   const [revealed, setRevealed] = useState(0);
   const [stepResults, setStepResults] = useState<Record<number, StepResult>>({});
   const [walking, setWalking] = useState(false);
@@ -333,6 +342,14 @@ export default function App() {
           </div>
           {verifyBadge}
           <span className="spacer" />
+          <button
+            className="btn ghost icon theme-toggle"
+            title={theme === "dark" ? "Switch to light mode" : "Switch to dark mode"}
+            aria-label="Toggle colour theme"
+            onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+          >
+            {theme === "dark" ? <Sun size={15} /> : <Moon size={15} />}
+          </button>
           <label className="switch">
             <input type="checkbox" checked={showVectors} onChange={(e) => setShowVectors(e.target.checked)} />
             <span className="track" /> Vectors
@@ -439,6 +456,10 @@ export default function App() {
               model={settings.model}
               activeStepText={activeStep?.text}
               onAnimate={(q) => runSolve({ text: q })}
+              onDemoPractice={() => {
+                loadSpec(practiceProjectile, FIXTURE_META, undefined, "practice-demo");
+                setInspTab("solution");
+              }}
               online={online}
             />
           </div>

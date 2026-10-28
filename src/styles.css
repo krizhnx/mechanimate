@@ -26,7 +26,69 @@
   --r-sm: 7px;
   --shadow-lg: 0 24px 64px rgba(0, 0, 0, 0.55), 0 0 0 1px var(--border);
   --mono: ui-monospace, "SF Mono", "JetBrains Mono", Menlo, monospace;
+  --track: #26262e;
+  --track-2: #52525b;
   color-scheme: dark;
+}
+
+/* ============ Light theme ============ */
+[data-theme="light"] {
+  --bg: #f4f4f7;
+  --panel: #ffffff;
+  --panel-2: #f8f8fa;
+  --elev: #f1f1f5;
+  --elev-2: #e8e8ee;
+  --border: #e4e4ea;
+  --border-2: #d6d6df;
+  --text: #17171c;
+  --text-2: #50505b;
+  --text-3: #868692;
+  --accent: #5b5cf0;
+  --accent-strong: #4f46e5;
+  --accent-soft: rgba(91, 92, 240, 0.09);
+  --accent-ring: rgba(91, 92, 240, 0.32);
+  --ok: #059669;
+  --ok-soft: rgba(5, 150, 105, 0.09);
+  --warn: #b45309;
+  --warn-soft: rgba(217, 119, 6, 0.1);
+  --bad: #dc2626;
+  --bad-soft: rgba(220, 38, 38, 0.07);
+  --shadow-lg: 0 24px 64px rgba(20, 20, 40, 0.16), 0 0 0 1px var(--border);
+  --track: #d9d9e1;
+  --track-2: #a1a1aa;
+  color-scheme: light;
+}
+/* The animated diagrams and the graph are drawn in a dark palette (many SVG colours).
+   In light mode, keep the dark variables inside them and flip lightness with invert + 180° hue-rotate:
+   backgrounds become light, labels dark, and vector hues (blue/red/amber/violet) stay recognisable. */
+[data-theme="light"] .canvas,
+[data-theme="light"] .graph-svg {
+  --bg: #08080a;
+  --panel: #0e0e11;
+  --panel-2: #131317;
+  --elev: #18181d;
+  --border: #212128;
+  --border-2: #2c2c35;
+  --text: #ededf0;
+  --text-2: #a1a1ab;
+  --text-3: #6b6b76;
+  --accent: #8b8cff;
+  --accent-strong: #6d6ef7;
+  --accent-soft: rgba(139, 140, 255, 0.12);
+  --accent-ring: rgba(139, 140, 255, 0.35);
+  --ok: #34d399;
+  --warn: #fbbf24;
+  --bad: #f87171;
+  --stage: #0b0d12;
+  --track: #26262e;
+  --track-2: #52525b;
+  filter: invert(1) hue-rotate(180deg);
+}
+[data-theme="light"] .stage {
+  box-shadow: 0 1px 2px rgba(20, 20, 40, 0.04);
+}
+html {
+  transition: background-color 0.2s ease;
 }
 
 * {
@@ -70,7 +132,7 @@ p {
   height: 10px;
 }
 ::-webkit-scrollbar-thumb {
-  background: #26262e;
+  background: var(--track);
   border-radius: 10px;
   border: 3px solid transparent;
   background-clip: content-box;
@@ -734,7 +796,7 @@ p {
   display: grid;
   place-items: center;
   background: var(--text);
-  color: #0b0b0f;
+  color: var(--bg);
   flex: none;
   transition: transform 0.08s;
 }
@@ -781,7 +843,7 @@ p {
 }
 .scrub .rail {
   right: 0;
-  background: #26262e;
+  background: var(--track);
 }
 .scrub .fill {
   background: linear-gradient(90deg, var(--accent-strong), var(--accent));
@@ -894,7 +956,7 @@ input[type="range"].range {
   width: 100%;
   height: 4px;
   border-radius: 4px;
-  background: linear-gradient(90deg, var(--accent-strong) var(--p, 50%), #26262e var(--p, 50%));
+  background: linear-gradient(90deg, var(--accent-strong) var(--p, 50%), var(--track) var(--p, 50%));
   outline: none;
 }
 input[type="range"].range::-webkit-slider-thumb {
@@ -1066,7 +1128,7 @@ input[type="range"].range::-webkit-slider-thumb {
   background: var(--warn);
 }
 .v-bar span.unchecked {
-  background: #33333d;
+  background: var(--track);
 }
 .part {
   margin-bottom: 22px;
@@ -1815,7 +1877,7 @@ button.chip:disabled {
   opacity: 0.45;
 }
 .v-bar span.revealed {
-  background: #52525b;
+  background: var(--track-2);
 }
 .score-card {
   display: flex;
@@ -1838,7 +1900,7 @@ button.chip:disabled {
   flex: none;
   display: grid;
   place-items: center;
-  background: conic-gradient(var(--ok) var(--pct, 0deg), #26262e 0);
+  background: conic-gradient(var(--ok) var(--pct, 0deg), var(--track) 0);
   position: relative;
 }
 .score-ring::before {
@@ -1877,4 +1939,22 @@ button.chip:disabled {
 }
 .attempt-actions .btn.ghost {
   padding-inline: 6px;
+}
+
+/* ============ Theme toggle + tutor demo ============ */
+.theme-toggle {
+  color: var(--text-2);
+}
+.theme-toggle:hover {
+  color: var(--text);
+}
+.demo-btn {
+  margin-top: 14px;
+  border-color: var(--accent-ring);
+  color: var(--accent);
+  background: var(--accent-soft);
+}
+.demo-btn:hover {
+  background: var(--accent-soft);
+  border-color: var(--accent);
 }

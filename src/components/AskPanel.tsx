@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
-import { ArrowUp, Bot, GraduationCap, Sparkles, User } from "lucide-react";
+import { ArrowUp, Bot, GraduationCap, PlayCircle, Sparkles, User } from "lucide-react";
 import { ask } from "../api";
+import { PRACTICE_TEXT } from "../fixtures";
 import type { Derived } from "../shared/physics";
 import type { Params, SceneSpec } from "../shared/types";
 import { RichText } from "./Tex";
@@ -9,6 +10,7 @@ interface Msg {
   role: "user" | "model";
   text: string;
   practice?: boolean;
+  demo?: boolean; // scripted offline demo - "Solve & animate" loads the hand-checked spec instantly
   error?: boolean;
 }
 
@@ -19,10 +21,11 @@ interface Props {
   model: string;
   activeStepText?: string;
   onAnimate: (questionText: string) => void;
+  onDemoPractice: () => void;
   online: boolean;
 }
 
-export function AskPanel({ spec, params, derived, model, activeStepText, onAnimate, online }: Props) {
+export function AskPanel({ spec, params, derived, model, activeStepText, onAnimate, onDemoPractice, online }: Props) {
   const [msgs, setMsgs] = useState<Msg[]>([]);
   const [input, setInput] = useState("");
   const [busy, setBusy] = useState(false);
@@ -48,6 +51,25 @@ export function AskPanel({ spec, params, derived, model, activeStepText, onAnima
     }
   }
 
+  // Scripted example of the practice-question flow, so it can be shown without a key or a 30 s wait.
+  function playDemo() {
+    if (busy) return;
+    setMsgs((m) => [...m, { role: "user", text: "Give me a similar practice question with different numbers (no solution)." }]);
+    setBusy(true);
+    setTimeout(() => {
+      setMsgs((m) => [
+        ...m,
+        {
+          role: "model",
+          practice: true,
+          demo: true,
+          text: `Here's one that uses exactly the same method with new numbers:\n\n${PRACTICE_TEXT}\n\nTip: $\\tan\\theta = \\tfrac34$ gives a 3-4-5 triangle, so the components come out as whole numbers.`,
+        },
+      ]);
+      setBusy(false);
+    }, 1400);
+  }
+
   const chips: { label: string; q: string; practice?: boolean }[] = [
     { label: "Explain the key idea", q: "Explain the key physics idea behind this question simply, as if I'm stuck." },
     ...(activeStepText ? [{ label: "Why this step?", q: `Why does this step work: "${activeStepText}"?` }] : []),
@@ -67,6 +89,11 @@ export function AskPanel({ spec, params, derived, model, activeStepText, onAnima
             <p className="muted" style={{ fontSize: 12.5, maxWidth: 300, margin: "0 auto" }}>
               Knows this question, the full working and your current slider values. Ask why, what-if, or for a practice question.
             </p>
+            {spec.topic === "projectile" && (
+              <button className="btn sm demo-btn" onClick={playDemo}>
+                <PlayCircle size={14} /> Demo: similar practice question
+              </button>
+            )}
           </div>
         )}
         {msgs.map((m, i) => (
@@ -75,7 +102,7 @@ export function AskPanel({ spec, params, derived, model, activeStepText, onAnima
             <div className="bubble">
               {m.role === "model" ? <RichText text={m.text} /> : m.text}
               {m.practice && !m.error && (
-                <button className="btn sm primary" onClick={() => onAnimate(m.text)}>
+                <button className="btn sm primary" onClick={() => (m.demo ? onDemoPractice() : onAnimate(m.text))}>
                   <Sparkles size={13} /> Solve & animate this
                 </button>
               )}

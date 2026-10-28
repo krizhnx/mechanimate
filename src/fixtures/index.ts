@@ -229,6 +229,86 @@ const roughSlope: SceneSpec = {
   ],
 };
 
+
+// What Gemma's "similar practice question" looks like for Q5 - used by the offline Tutor demo.
+// Hand-checked: tan θ = 3/4 → u_x = 20, u_y = 15; NA = 100 → t = 5 s; −H = 75 − 122.5 → H = 47.5;
+// rise above O = 15²/19.6 = 11.48 → greatest height 58.98 m.
+export const PRACTICE_TEXT =
+  "A ball is projected with speed 25 m s⁻¹ from a point O on the top of a cliff, at an angle θ above the horizontal, where tan θ = 3/4. The point O is H metres vertically above the point N on horizontal ground. The ball lands at the point A, where NA = 100 m. The ball is modelled as a particle moving freely under gravity. Find (a) the value of H, (b) the greatest height of the ball above the ground.";
+
+export const practiceProjectile: SceneSpec = {
+  topic: "projectile",
+  title: "Practice: ball projected from a cliff",
+  questionText: PRACTICE_TEXT,
+  g: 9.8,
+  objectLabel: "ball",
+  givens: [
+    { symbol: "U", value: 25, unit: "m/s", label: "Speed of projection", quantity: "speed" },
+    { symbol: "tan θ", value: 0.75, unit: "", label: "Angle of projection (θ ≈ 36.87°)", quantity: "none" },
+    { symbol: "NA", value: 100, unit: "m", label: "Horizontal distance to landing point", quantity: "range" },
+    { symbol: "g", value: 9.8, unit: "m/s²", label: "Acceleration due to gravity", quantity: "none" },
+  ],
+  params: { speed: 25, angleDeg: (Math.atan(0.75) * 180) / Math.PI, launchHeight: 47.5 },
+  labels: { origin: "O", base: "N", landing: "A" },
+  assumptions: ["Ball modelled as a particle", "No air resistance", "g = 9.8 m s⁻²"],
+  parts: [
+    {
+      id: "a",
+      question: "Find the value of H.",
+      steps: [
+        {
+          text: "Resolve the initial velocity. tan θ = 3/4 gives a 3-4-5 right-angled triangle.",
+          latex: "\\tan\\theta=\\tfrac34 \\;\\Rightarrow\\; \\sin\\theta=\\tfrac35,\\quad \\cos\\theta=\\tfrac45",
+          highlight: "components",
+        },
+        {
+          text: "The horizontal component of velocity is constant (no horizontal force).",
+          latex: "u_x = 25\\cos\\theta = 20\\ \\text{m s}^{-1}",
+          highlight: "horizontal",
+        },
+        {
+          text: "Use horizontal motion from O to A to find the time of flight.",
+          latex: "100 = 20t \\;\\Rightarrow\\; t = 5\\ \\text{s}",
+          highlight: "time",
+        },
+        {
+          text: "Vertical motion (up positive): the ball ends H metres below O, so s = −H.",
+          latex: "-H = (25\\sin\\theta)t - \\tfrac12(9.8)t^2 = 15(5) - 4.9(25)",
+          highlight: "vertical",
+        },
+        {
+          text: "Simplify.",
+          latex: "-H = 75 - 122.5 \\;\\Rightarrow\\; H = 47.5",
+          highlight: "landing",
+        },
+      ],
+      answer: { quantity: "launchHeight", value: 47.5, unit: "m", display: "H = 47.5" },
+    },
+    {
+      id: "b",
+      question: "Find the greatest height of the ball above the ground.",
+      steps: [
+        {
+          text: "At the highest point the vertical velocity is zero. Use v² = u² + 2as vertically.",
+          latex: "0^2 = 15^2 - 2(9.8)s",
+          highlight: "vertical",
+        },
+        {
+          text: "Solve for the height gained above O.",
+          latex: "s = \\dfrac{225}{19.6} \\approx 11.48\\ \\text{m above } O",
+          highlight: "max_height",
+        },
+        {
+          text: "Add the height of the cliff.",
+          latex: "47.5 + 11.48 \\approx 59.0\\ \\text{m}",
+          highlight: "max_height",
+        },
+      ],
+      answer: { quantity: "maxHeight", value: 58.98, unit: "m", display: "59.0 m (3 s.f.)" },
+    },
+  ],
+};
+
 export const EXAMPLES: Example[] = [
   { id: "q5-projectile", name: "Projectile from a cliff", blurb: "Edexcel-style Q5 · find H and max height", image: "/examples/q5-projectile.png", spec: projectileCliff },
   { id: "q1-car", name: "Car & forces", blurb: "SUVAT + Newton's 2nd law · find v and D", image: "/examples/q1-car.png", spec: carForces },

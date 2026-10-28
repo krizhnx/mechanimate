@@ -31,6 +31,9 @@ Gemma 4 (an open-weight model) is the core of the app. Without it you only get t
    - Score card: correct = 1 mark, with hints = ½, revealed = 0.
 5. **What-if sliders** (speed, angle, masses, μ, forces…) update the animation, v–t graph and results instantly, then **Re-solve with Gemma** for new working.
 6. Timeline scrubbing, event markers (max height, impact, string goes slack), playback speed.
+7. **Practice questions**: in the Tutor tab, Gemma writes a similar question with new numbers, and one click solves and animates it. An offline **Demo** button replays this flow instantly with a hand-checked practice question (no key needed).
+8. **Light and dark themes**, a searchable library, and keyboard shortcuts (`N` new question, `/` search, `Space` play, `←/→` steps).
+9. *Preview UI (not wired up yet):* PDF import with page picker, and "scan with your phone" via QR code. Images and screenshots are fully supported today.
 
 ### Supported animation templates
 
